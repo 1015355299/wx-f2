@@ -1,5 +1,6 @@
 
 import F2 from '@antv/f2';
+
 F2.Global.fontFamily = 'sans-serif';
 
 Component({
@@ -9,15 +10,10 @@ Component({
       type: Array,
       value: [],
       observer(data) {
-        const { data: { showImage }, chart, node, triggerEvent } = this;
+        const { chart, node, triggerEvent } = this;
         if (chart) {
           chart.changeData(data);
-          triggerEvent('update', { data, chart, node });
-          if (showImage) {
-            this.setData({
-              dataURL: node._canvasRef.toDataURL('image/png')
-            });
-          }
+          triggerEvent('update', { chart, node });
         } else if (data && data.length) {
           this.init();
         }
@@ -32,11 +28,6 @@ Component({
     appendPadding: {
       type: null,
       value: 0
-    },
-    // 是否显示为图片
-    showImage: {
-      type: Boolean,
-      value: false
     }
   },
 
@@ -57,7 +48,7 @@ Component({
           size: true
         })
         .exec(res => {
-          const { data: { data, padding, appendPadding, showImage }, triggerEvent } = this;
+          const { data: { data, padding, appendPadding }, triggerEvent } = this;
           const { node, width, height } = res[0];
           const context = node.getContext('2d');
           const pixelRatio = wx.getSystemInfoSync().pixelRatio;
@@ -65,21 +56,23 @@ Component({
           node.width = width * pixelRatio;
           node.height = height * pixelRatio;
 
-          const config = { context, width, height, pixelRatio, padding, appendPadding };
+          const config = {
+            context,
+            width,
+            height,
+            pixelRatio,
+            padding,
+            appendPadding
+          };
+          triggerEvent('init', { F2, pixelRatio });
+
           const chart = new F2.Chart(config);
+          chart.source(data);
 
-          triggerEvent('draw', { data, chart, node });
+          triggerEvent('draw', { chart, node });
 
-          if (showImage) {
-            chart.animate(false);
-            chart.render();
-            this.setData({
-              dataURL: node._canvasRef.toDataURL('image/png')
-            });
-          } else {
-            chart.render();
-          }
-          triggerEvent('reload', { data, chart, node });
+          chart.render();
+          triggerEvent('reload', { chart, node });
 
           this.chart = chart;
           this.canvasEl = chart.get('el');
