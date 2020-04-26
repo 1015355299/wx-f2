@@ -110,12 +110,12 @@ Page({
 |data|数据源(修改data会自动更新图表)|Array|[]|
 |padding|图表绘图区域和画布边框的间距|String/Number/Array|"auto"|
 |append-padding|图表画布区域四边的预留边距|Number/Array|0|
-|show-image|是否以图片显示|Boolean|false|
 
 ### Events
 
 |事件名|说明|
 |:-|:-|
+|init|F2初始化|
 |draw|chart绘制|
 |reload|chart绘制完成|
 |update|数据更新|
